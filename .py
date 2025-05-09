@@ -25,7 +25,8 @@ def parse_input(file_path):
             nets[net_name] = [
                 (int(x), int(y))
                 for (layer, x, y) in coords
-               
+                if layer == '1' and 0 <= int(x) < width and 0 <= int(y) < height
+
             ]
     return grid, nets, width, height, obstacles
 
