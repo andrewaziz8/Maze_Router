@@ -9,14 +9,14 @@ This project implements a grid-based routing system using **Lee's algorithm** to
 - Shaza Ali  
 - Adham Hassan  
 
-## Input Format (Abstract)
+## Input Format
 - The first line defines the grid size:  
   `WIDTHxHEIGHT` (e.g., `8x8`)
 - Following lines include:
   - Obstacles: `OBS (x, y)`
   - Nets: `netName (layer, x, y) (layer, x, y) ...`
 
-## Output Format (Abstract)
+## Output Format 
 - A routed path per net in this format:  
   `netName (1, x1, y1) (1, x2, y2) ... (1, xn, yn)`
 - A matplotlib plot is also generated to visually represent the routing layout, including:
