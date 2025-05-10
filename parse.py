@@ -1,5 +1,4 @@
-
-
+import re
 
 def parse_input(file_path):
     with open(file_path, 'r') as f:
@@ -14,6 +13,7 @@ def parse_input(file_path):
 
     obstacles = []
     nets = {}
+    pins_by_net = {}
     for line in lines[1:]:
         if line.startswith('OBS'):
             x, y = map(int, re.findall(r'\((\d+),\s*(\d+)\)', line)[0])
@@ -22,11 +22,11 @@ def parse_input(file_path):
         elif line.startswith('net'):
             net_name = line.split()[0]
             coords = re.findall(r'\((\d+),\s*(\d+),\s*(\d+)\)', line)
+            pins = [(int(x), int(y)) for (layer, x, y) in coords if layer == '1']
+            pins_by_net[net_name] = pins
             nets[net_name] = [
                 (int(x), int(y))
                 for (layer, x, y) in coords
                 if layer == '1' and 0 <= int(x) < width and 0 <= int(y) < height
-
             ]
-    return grid, nets, width, height, obstacles
-
+    return grid, nets, width, height, obstacles, pins_by_net
