@@ -9,7 +9,7 @@ def route_net(grid, pins):
         for s in sources:
             for t in targets:
                 path = lee_algorithm(current_grid, s, t)
-                if (shortest_path is None or len(path) < len(shortest_path)):
+                if path and (shortest_path is None or len(path) < len(shortest_path)):
                     shortest_path = path
                     best_target = t
         if not shortest_path:
@@ -20,4 +20,4 @@ def route_net(grid, pins):
             current_grid[cell[1]][cell[0]] = -2
         sources.extend(shortest_path)
         targets.remove(best_target)
-    return routed_path
+    return routed_path
