@@ -119,40 +119,50 @@ def visualize_routing(output_file, input_file):
     with open(output_file, 'r') as f:
         lines = f.readlines()
 
-    for idx, line in enumerate(lines):
+    fig, ax = plt.subplots(figsize=(10, 12))
+    ax.set_aspect('equal')
+    ax.set_title("Combined Routing for All Nets")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    plt.grid(True)
+
+    # Draw obstacles
+    if obstacles:
+        obs_xs, obs_ys = zip(*obstacles)
+        ax.scatter(obs_xs, obs_ys, marker='s', s=100, color='black', label='Obstacles', zorder=1)
+
+    # Color cycle for nets
+    color_cycle = itertools.cycle(['blue', 'green', 'orange', 'purple', 'red', 'yellow', 'brown'])
+
+    for line in lines:
         net_name = line.split()[0]
         route_parts = re.findall(r'\((\d+),\s*(\d+),\s*(\d+)\)', line)
         route_coords = [(int(x), int(y)) for (_, x, y) in route_parts]
+        color = next(color_cycle)
 
         if not route_coords:
             continue
 
-        fig, ax = plt.subplots(figsize=(8, 6))
+        # Draw segments between adjacent path points
+        for i in range(len(route_coords) - 1):
+            x1, y1 = route_coords[i]
+            x2, y2 = route_coords[i + 1]
+            if abs(x1 - x2) + abs(y1 - y2) == 1:  # Manhattan segment
+                ax.plot([x1, x2], [y1, y2], '-', color=color, linewidth=1.5, label=f"{net_name} route" if i == 0 else "")
 
-        # Draw obstacles
-        if obstacles:
-            obs_xs, obs_ys = zip(*obstacles)
-            ax.scatter(obs_xs, obs_ys, marker='s', s=100, color='black', label='Obstacles', zorder=2)
-
-        # Draw net route
+        # Draw routed dots
         xs, ys = zip(*route_coords)
-        ax.plot(xs, ys, '-', color='blue', label=f"{net_name} route", linewidth=1.5)
-        ax.scatter(xs, ys, color='blue', s=10, alpha=0.4)
+        ax.scatter(xs, ys, color=color, s=10, alpha=0.3)
 
-        # Draw pins for this net
+        # Draw pins
         pins = pins_by_net.get(net_name, [])
         if pins:
             pin_xs, pin_ys = zip(*pins)
-            ax.scatter(pin_xs, pin_ys, marker='*', s=200, color='red', label=f"{net_name} pins", zorder=3)
+            ax.scatter(pin_xs, pin_ys, marker='*', s=200, color='red', label=f"{net_name} pins")
 
-        ax.set_title(f"Routing for {net_name}")
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        ax.set_aspect('equal')
-        ax.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
+    ax.legend(loc='best', fontsize='small')
+    plt.tight_layout()
+    plt.show()
 
 # Example usage:
 main("input3.txt", "output.txt")
