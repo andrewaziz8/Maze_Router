@@ -1,5 +1,3 @@
-import sys
-import heapq
 from collections import deque
 import re
 
@@ -16,6 +14,7 @@ def parse_input(file_path):
 
     obstacles = []
     nets = {}
+    pins_by_net = {}
     for line in lines[1:]:
         if line.startswith('OBS'):
             x, y = map(int, re.findall(r'\((\d+),\s*(\d+)\)', line)[0])
@@ -24,13 +23,14 @@ def parse_input(file_path):
         elif line.startswith('net'):
             net_name = line.split()[0]
             coords = re.findall(r'\((\d+),\s*(\d+),\s*(\d+)\)', line)
+            pins = [(int(x), int(y)) for (layer, x, y) in coords if layer == '1']
+            pins_by_net[net_name] = pins
             nets[net_name] = [
                 (int(x), int(y))
                 for (layer, x, y) in coords
                 if layer == '1' and 0 <= int(x) < width and 0 <= int(y) < height
-
             ]
-    return grid, nets, width, height, obstacles
+    return grid, nets, width, height, obstacles, pins_by_net
 
 def lee_algorithm(grid, start, goal):
     h, w = len(grid), len(grid[0])
@@ -95,7 +95,7 @@ def write_output(routed, output_path):
             f.write(line + "\n")
 
 def main(input_path, output_path):
-    grid, nets, width, height, obstacles = parse_input(input_path)
+    grid, nets, width, height, obstacles,_ = parse_input(input_path)
     routed_nets = {}
     for net, pins in nets.items():
         if not pins:
@@ -112,4 +112,4 @@ def main(input_path, output_path):
     print("Routing complete. Output saved.")
 
 # Example usage:
-main("input.txt", "output.txt")
+main("input3.txt", "output.txt")
