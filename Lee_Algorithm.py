@@ -5,7 +5,7 @@ def lee_algorithm(grid, start, goal):
     parent = [[None]*w for _ in range(h)]
     q = deque()
     q.append(start)
-    visited[start[0]][start[1]] = True
+    visited[start[1]][start[0]] = True
 
     directions = [(0,1), (1,0), (-1,0), (0,-1)]
     while q:
@@ -14,9 +14,9 @@ def lee_algorithm(grid, start, goal):
             break
         for dx, dy in directions:
             nx, ny = x+dx, y+dy
-            if 0 <= nx < w and 0 <= ny < h and not visited[nx][ny] and grid[nx][ny] == 1:
-                visited[nx][ny] = True
-                parent[nx][ny] = (x, y)
+            if 0 <= nx < w and 0 <= ny < h and not visited[ny][nx] and grid[ny][nx] == 0:
+                visited[ny][nx] = True
+                parent[ny][nx] = (x, y)
                 q.append((nx, ny))
 
     # Backtrack path
@@ -24,7 +24,7 @@ def lee_algorithm(grid, start, goal):
     cur = goal
     while cur != start:
         path.append(cur)
-        cur = parent[cur[0]][cur[1]]
+        cur = parent[cur[1]][cur[0]]
         if cur is None:
             return []  # No path
     path.append(start)
