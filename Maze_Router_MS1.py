@@ -1,5 +1,7 @@
 from collections import deque
 import re
+import matplotlib.pyplot as plt
+import itertools
 
 def parse_input(file_path):
     with open(file_path, 'r') as f:
@@ -30,7 +32,7 @@ def parse_input(file_path):
                 for (layer, x, y) in coords
                 if layer == '1' and 0 <= int(x) < width and 0 <= int(y) < height
             ]
-    return grid, nets, width, height, obstacles, pins_by_net
+    return grid, nets, width, height, obstacles, pins_by_net
 
 def lee_algorithm(grid, start, goal):
     h, w = len(grid), len(grid[0])
@@ -63,7 +65,7 @@ def lee_algorithm(grid, start, goal):
     path.append(start)
     path.reverse()
     return path
-    
+
 def route_net(grid, pins):
     routed_path = []
     sources = [pins[0]]
@@ -111,5 +113,48 @@ def main(input_path, output_path):
     write_output(routed_nets, output_path)
     print("Routing complete. Output saved.")
 
+def visualize_routing(output_file, input_file):
+    _, _, _, _, obstacles, pins_by_net = parse_input(input_file)
+
+    with open(output_file, 'r') as f:
+        lines = f.readlines()
+
+    for idx, line in enumerate(lines):
+        net_name = line.split()[0]
+        route_parts = re.findall(r'\((\d+),\s*(\d+),\s*(\d+)\)', line)
+        route_coords = [(int(x), int(y)) for (_, x, y) in route_parts]
+
+        if not route_coords:
+            continue
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        # Draw obstacles
+        if obstacles:
+            obs_xs, obs_ys = zip(*obstacles)
+            ax.scatter(obs_xs, obs_ys, marker='s', s=100, color='black', label='Obstacles', zorder=2)
+
+        # Draw net route
+        xs, ys = zip(*route_coords)
+        ax.plot(xs, ys, '-', color='blue', label=f"{net_name} route", linewidth=1.5)
+        ax.scatter(xs, ys, color='blue', s=10, alpha=0.4)
+
+        # Draw pins for this net
+        pins = pins_by_net.get(net_name, [])
+        if pins:
+            pin_xs, pin_ys = zip(*pins)
+            ax.scatter(pin_xs, pin_ys, marker='*', s=200, color='red', label=f"{net_name} pins", zorder=3)
+
+        ax.set_title(f"Routing for {net_name}")
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.set_aspect('equal')
+        ax.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
 # Example usage:
 main("input3.txt", "output.txt")
+# Example usage:
+visualize_routing("output.txt", "input3.txt")
