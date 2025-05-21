@@ -23,6 +23,7 @@ This project implements a grid-based routing system using **Lee's algorithm** to
   - Obstacles (black squares)
   - Pins (red stars)
   - Routed paths (coloured lines)
+  - The source(first pin) is visualized using a red circle with an "S" letter inside. 
 
 ## Usage
 ```python
